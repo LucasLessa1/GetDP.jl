@@ -9,22 +9,36 @@ A system item in a resolution.
 mutable struct SystemItem
     name::String
     formulation::String
-    Type::String
-    Frequency::String
+    Type::Union{String,Nothing}
+    Frequency::Union{String,Nothing}
     comment::Union{String,Nothing}
     kwargs::Dict
 
-    function SystemItem(name, formulation; Type, Frequency, comment=nothing, kwargs...)
+    function SystemItem(name, formulation; Type=nothing, Frequency=nothing, comment=nothing, kwargs...)
         new(name, formulation, Type, Frequency, comment, Dict(kwargs))
     end
 end
 
 function code(item::SystemItem)
-    c = "{ Name $(item.name); NameOfFormulation $(item.formulation); Type $(item.Type); Frequency $(item.Frequency);"
+    c = "{ Name $(item.name); NameOfFormulation $(item.formulation);"
+    
+    # Only add Type if it's not nothing and not empty
+    if item.Type !== nothing && !isempty(item.Type)
+        c *= " Type $(item.Type);"
+    end
+    
+    # Only add Frequency if it's not nothing and not empty
+    if item.Frequency !== nothing && !isempty(item.Frequency)
+        c *= " Frequency $(item.Frequency);"
+    end
+    
+    # Add any additional kwargs
     for (k, v) in item.kwargs
         c *= " $k $(make_args(v, sep=","));"
     end
+    
     c *= " }"
+    
     if item.comment !== nothing
         c = comment(item.comment, newline=false) * "\n" * c
     end
@@ -79,16 +93,18 @@ mutable struct Resolution <: AbstractGetDPObject
 end
 
 """
-    add!(resolution::Resolution, id, system_name; kwargs...)
+    add!(resolution::Resolution, id::String, systems::Vector{SystemItem}; Operation::Vector{String})
 
-Add a resolution with system and operation to the Resolution object.
+Add a resolution with one or more systems and an operation to the Resolution object.
 """
-function add!(resolution::Resolution, id, system_name; NameOfFormulation=nothing, Type, Frequency, Operation, comment=nothing, kwargs...)
-    # Use id as resolution name, NameOfFormulation for system formulation
+function add!(resolution::Resolution, id::String, systems::Vector{SystemItem}; Operation::Vector{String})
+    # Use id as resolution name
     resolution.name = id
-    formulation = NameOfFormulation !== nothing ? NameOfFormulation : id
-    system = SystemItem(system_name, formulation; Type=Type, Frequency=Frequency, comment=comment, kwargs...)
-    push!(resolution.systems, system)
+
+    # Add all provided system items
+    for system in systems
+        push!(resolution.systems, system)
+    end
 
     # Add operations to Operation
     for op in Operation
@@ -135,13 +151,19 @@ function code(resolution::Resolution)
     push!(code_lines, "    Operation {")
     operation_code = code(resolution.operation)
     for line in split(operation_code, '\n')
-        push!(code_lines, "      " * line*";")
+        # Don't add semicolon if line already contains control flow keywords
+        if occursin(r"(If|Else|EndIf|IterativeLoop|TimeLoop|{|})", line)
+            push!(code_lines, "      " * line)
+        else
+            push!(code_lines, "      " * line * ";")
+        end
     end
     push!(code_lines, "    }")
     push!(code_lines, "  }")
     push!(code_lines, "}")
     join(code_lines, "\n") * "\n"
 end
+
 # System struct
 mutable struct System
     items::Vector{SystemItem}
