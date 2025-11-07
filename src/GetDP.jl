@@ -31,9 +31,9 @@ include("problem_definition.jl")
 
 # Export public API
 export Constraint, Formulation, Function, FunctionSpace, Group, Integration
-export Jacobian, PostOperation, PostProcessing, Problem, Resolution
+export Jacobian, PostOperation, PostProcessing, Problem, Resolution, SystemItem
 export define!, add!, add_list!, add_file!, add_analytic!, add_piecewise!, add_akima!
-export add_quantity!, add_equation!, content, add_subspace!
+export add_quantity!, add_equation!, content, add_subspace!, add_quantity_term!, add_post_quantity_term!
 export Region, Global, NodesOf, EdgesOf, FacetsOf, VolumesOf, ElementsOf
 export GroupsOfNodesOf, GroupsOfEdgesOf, GroupsOfEdgesOnNodesOf, GroupOfRegionsOf
 export EdgesOfTreeIn, FacetsOfTreeIn, DualNodesOf, DualEdgesOf, DualFacetsOf, DualVolumesOf
