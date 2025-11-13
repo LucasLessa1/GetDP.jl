@@ -25,7 +25,8 @@ problem.jacobian = jac
 integ = Integration()
 i1 = add!(integ, "I1")
 case = add!(i1)
-geo_case = add_nested_case!(case; type="Gauss")
+gauss_case = add!(case; Type="Gauss")
+geo_case = add_nested_case!(gauss_case)
 add!(geo_case; GeoElement="Point", NumberOfPoints=1)
 add!(geo_case; GeoElement="Line", NumberOfPoints=4)
 add!(geo_case; GeoElement="Triangle", NumberOfPoints=4)
@@ -34,7 +35,7 @@ add!(geo_case; GeoElement="Triangle2", NumberOfPoints=7)
 problem.integration = integ
 
 # Generate and write the .pro file
-make_problem!(problem)
+make_file!(problem)
 # Generate and write the .pro file
 problem.filename = "jacobian_by_jlgetdp.pro"
 write_file(problem)

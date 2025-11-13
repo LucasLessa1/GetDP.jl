@@ -78,12 +78,10 @@ problem.formulation = formulation
 # Define Resolution
 resolution = Resolution()
 
-sys_mag = SystemItem("Sys_Mag", "Darwin_a_2D"; 
-    Type="Complex", 
-    Frequency="Freq"
-)
 # Add a resolution
-add!(resolution, "Darwin", [sys_mag],
+add!(resolution, "Darwin", "Sys_Mag",
+    NameOfFormulation="Darwin_a_2D",
+    Type="Complex", Frequency="Freq",
     Operation=[
         "CreateDir[\"res\"]",
         "InitSolution[Sys_Mag]",
@@ -101,77 +99,77 @@ problem.resolution = resolution
 postprocessing = PostProcessing()
 
 pp = add!(postprocessing, "Darwin_a_2D", "Darwin_a_2D")
-q = add_post_quantity_term!(pp, "a")
+q = add!(pp, "a")
 add!(q, "Term", "{a}"; In="Domain_Mag", Jacobian="Vol")
-q = add_post_quantity_term!(pp, "az")
+q = add!(pp, "az")
 add!(q, "Term", "CompZ[{a}]"; In="Domain_Mag", Jacobian="Vol")
-q = add_post_quantity_term!(pp, "b")
+q = add!(pp, "b")
 add!(q, "Term", "{d a}"; In="Domain_Mag", Jacobian="Vol")
-q = add_post_quantity_term!(pp, "bm")
+q = add!(pp, "bm")
 add!(q, "Term", "Norm[{d a}]"; In="Domain_Mag", Jacobian="Vol")
 
 # Multi-term entries
-q = add_post_quantity_term!(pp, "j")
+q = add!(pp, "j")
 add!(q, "Term", "-sigma[]*(Dt[{a}]+{ur})"; In="DomainC_Mag", Jacobian="Vol")
 add!(q, "Term", "js0[]"; In="DomainS0_Mag", Jacobian="Vol")
 add!(q, "Term", "Ns[]/Sc[]*{ir}"; In="DomainS_Mag", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "jz")
+q = add!(pp, "jz")
 add!(q, "Term", "CompZ[-sigma[]*(Dt[{a}]+{ur})]"; In="DomainC_Mag", Jacobian="Vol")
 add!(q, "Term", "CompZ[js0[]]"; In="DomainS0_Mag", Jacobian="Vol")
 add!(q, "Term", "CompZ[Ns[]/Sc[]*{ir}]"; In="DomainS_Mag", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "jm")
+q = add!(pp, "jm")
 add!(q, "Term", "Norm[-sigma[]*(Dt[{a}]+{ur})]"; In="DomainC_Mag", Jacobian="Vol")
 add!(q, "Term", "Norm[js0[]]"; In="DomainS0_Mag", Jacobian="Vol")
 add!(q, "Term", "Norm[Ns[]/Sc[]*{ir}]"; In="DomainS_Mag", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "d")
+q = add!(pp, "d")
 add!(q, "Term", "epsilon[] * Dt[Dt[{a}]+{ur}]"; In="DomainC_Mag", Jacobian="Vol")
-q = add_post_quantity_term!(pp, "dz")
+q = add!(pp, "dz")
 add!(q, "Term", "CompZ[epsilon[] * Dt[Dt[{a}]+{ur}]]"; In="DomainC_Mag", Jacobian="Vol")
-q = add_post_quantity_term!(pp, "dm")
+q = add!(pp, "dm")
 add!(q, "Term", "Norm[epsilon[] * Dt[Dt[{a}]+{ur}]]"; In="DomainC_Mag", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "rhoj2")
+q = add!(pp, "rhoj2")
 add!(q, "Term", "0.5*sigma[]*SquNorm[Dt[{a}]+{ur}]"; In="DomainC_Mag", Jacobian="Vol")
 add!(q, "Term", "0.5/sigma[]*SquNorm[js0[]]"; In="DomainS0_Mag", Jacobian="Vol")
 add!(q, "Term", "0.5/sigma[]*SquNorm[Ns[]/Sc[]*{ir}]"; In="DomainS_Mag", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "JouleLosses")
+q = add!(pp, "JouleLosses")
 add!(q, "Integral", "0.5*sigma[]*SquNorm[Dt[{a}]]"; In="DomainC_Mag", Jacobian="Vol", Integration="I1")
 add!(q, "Integral", "0.5/sigma[]*SquNorm[js0[]]"; In="DomainS0_Mag", Jacobian="Vol", Integration="I1")
 add!(q, "Integral", "0.5/sigma[]*SquNorm[Ns[]/Sc[]*{ir}]"; In="DomainS_Mag", Jacobian="Vol", Integration="I1")
 
-q = add_post_quantity_term!(pp, "U")
+q = add!(pp, "U")
 add!(q, "Term", "{U}"; In="DomainC_Mag")
 add!(q, "Term", "{Us}"; In="DomainS_Mag")
 
-q = add_post_quantity_term!(pp, "I")
+q = add!(pp, "I")
 add!(q, "Term", "{I}"; In="DomainC_Mag")
 add!(q, "Term", "{Is}"; In="DomainS_Mag")
 
-q = add_post_quantity_term!(pp, "S")
+q = add!(pp, "S")
 add!(q, "Term", "{U}*Conj[{I}]"; In="DomainC_Mag")
 add!(q, "Term", "{Us}*Conj[{Is}]"; In="DomainS_Mag")
 
-q = add_post_quantity_term!(pp, "R")
+q = add!(pp, "R")
 add!(q, "Term", "-Re[{U}/{I}]"; In="DomainC_Mag")
 add!(q, "Term", "-Re[{Us}/{Is}]"; In="DomainS_Mag")
 
-q = add_post_quantity_term!(pp, "L")
+q = add!(pp, "L")
 add!(q, "Term", "-Im[{U}/{I}]/(2*Pi*Freq)"; In="DomainC_Mag")
 add!(q, "Term", "-Im[{Us}/{Is}]/(2*Pi*Freq)"; In="DomainS_Mag")
 
-q = add_post_quantity_term!(pp, "R_per_km"; comment=" For convenience... possible scaling")
+q = add!(pp, "R_per_km"; comment=" For convenience... possible scaling")
 add!(q, "Term", "-Re[{U}/{I}]*1e3"; In="DomainC_Mag")
 add!(q, "Term", "-Re[{Us}/{Is}]*1e3"; In="DomainS_Mag")
 
-q = add_post_quantity_term!(pp, "mL_per_km")
+q = add!(pp, "mL_per_km")
 add!(q, "Term", "-1e6*Im[{U}/{I}]/(2*Pi*Freq)"; In="DomainC_Mag")
 add!(q, "Term", "-1e6*Im[{Us}/{Is}]/(2*Pi*Freq)"; In="DomainS_Mag")
 
-q = add_post_quantity_term!(pp, "Zs")
+q = add!(pp, "Zs")
 add!(q, "Term", "-{U}/{I}"; In="DomainC_Mag")
 add!(q, "Term", "-{Us}/{Is}"; In="DomainS_Mag")
 
@@ -216,7 +214,7 @@ add_operation!(op2, "Print[ Zs[DomainC_Mag], OnRegion Inds, Format Table,\n    S
 problem.postoperation = postoperation
 
 # Generate and write the .pro file
-make_problem!(problem)
+make_file!(problem)
 
 # Write the code to a file
 problem.filename = "darwin_formulation.pro"

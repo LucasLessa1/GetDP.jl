@@ -8,12 +8,11 @@ include("../test/normalized.jl")
 @testset "Resolution Generation" begin
     
     resolution = Resolution()
-    sys_mag = SystemItem("Sys_Mag", "Darwin_2D"; 
-        Type="Complex", 
-        Frequency="Freq"
-    )
+
     # Add a resolution
-    add!(resolution, "Darwin", [sys_mag],
+    add!(resolution, "Darwin", "Sys_Mag",
+        NameOfFormulation="Darwin_2D",
+        Type="Complex", Frequency="Freq",
         Operation=[
             "CreateDir[\"res\"]",
             "InitSolution[Sys_Mag]",

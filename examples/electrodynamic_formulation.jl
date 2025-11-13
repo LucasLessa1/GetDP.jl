@@ -40,11 +40,10 @@ problem.formulation = formulation
 
 # Resolution section
 resolution = Resolution()
-sys_ele = SystemItem("Sys_Ele", "Electrodynamics_v"; 
-    Type="Complex", 
-    Frequency="Freq"
-)
-add!(resolution,  "Electrodynamics", [sys_ele],
+add!(resolution, "Electrodynamics", "Sys_Ele",
+    NameOfFormulation="Electrodynamics_v",
+    Type="Complex",
+    Frequency="Freq",
     Operation=[
         "CreateDir[\"res\"]",
         "Generate[Sys_Ele]",
@@ -60,42 +59,42 @@ problem.resolution = resolution
 postprocessing = PostProcessing()
 pp = add!(postprocessing, "EleDyn_v", "Electrodynamics_v")
 
-q = add_post_quantity_term!(pp, "v")
+q = add!(pp, "v")
 add!(q, "Term", "{v}"; In="Domain_Ele", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "e")
+q = add!(pp, "e")
 add!(q, "Term", "-{d v}"; In="Domain_Ele", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "em")
+q = add!(pp, "em")
 add!(q, "Term", "Norm[-{d v}]"; In="Domain_Ele", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "d")
+q = add!(pp, "d")
 add!(q, "Term", "-epsilon[] * {d v}"; In="Domain_Ele", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "dm")
+q = add!(pp, "dm")
 add!(q, "Term", "Norm[-epsilon[] * {d v}]"; In="Domain_Ele", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "j")
+q = add!(pp, "j")
 add!(q, "Term", "-sigma[] * {d v}"; In="Domain_Ele", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "jm")
+q = add!(pp, "jm")
 add!(q, "Term", "Norm[-sigma[] * {d v}]"; In="Domain_Ele", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "jtot")
+q = add!(pp, "jtot")
 add!(q, "Term", "-sigma[] * {d v}"; In="Domain_Ele", Jacobian="Vol")
 add!(q, "Term", "-epsilon[] * Dt[{d v}]"; In="Domain_Ele", Jacobian="Vol")
 
-q = add_post_quantity_term!(pp, "ElectricEnergy")
+q = add!(pp, "ElectricEnergy")
 add!(q, "Integral", "0.5 * epsilon[] * SquNorm[{d v}]"; In="Domain_Ele", Jacobian="Vol", Integration="I1")
 
 # V0
-q = add_post_quantity_term!(pp, "V0")
+q = add!(pp, "V0")
 add!(q, "Term", "V0 * F_Cos_wt_p[]{2*Pi*Freq, Pa}"; Type="Global", In="Ind_1")
 add!(q, "Term", "V0 * F_Cos_wt_p[]{2*Pi*Freq, Pb}"; Type="Global", In="Ind_2")
 add!(q, "Term", "V0 * F_Cos_wt_p[]{2*Pi*Freq, Pc}"; Type="Global", In="Ind_3")
 
 # C_from_Energy
-q = add_post_quantity_term!(pp, "C_from_Energy")
+q = add!(pp, "C_from_Energy")
 add!(q, "Term", "2*\$We/SquNorm[\$voltage]"; Type="Global", In="DomainDummy")
 
 problem.postprocessing = postprocessing
@@ -140,7 +139,7 @@ add_operation!(op2, "Echo[Str[\"View[PostProcessing.NbViews-1].Type = 4;\",\n   
 problem.postoperation = postoperation
 
 # Generate and write the .pro file
-make_problem!(problem)
+make_file!(problem)
 
 # Write the code to a file
 problem.filename = "electrodynamic_formulation_byjlgetdp.pro"
